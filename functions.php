@@ -119,7 +119,28 @@ if($authnet['useLibCurl'] == "True") {
 		curl_setopt($ch,CURLOPT_POSTFIELDS,$data);
 		//Start ob to prevent curl_exec from displaying stuff.
 		ob_start();
-		curl_exec($ch);
+		$response = curl_exec($ch);
+		$code     = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		
+		//Check we got a response
+		if(!$response) {
+		    $errno = curl_errno($ch);
+		    $error = curl_error($ch);
+		    
+		    $message = "Authorize.net curl error: code=$code, info=CURL error: $errno - $error";
+		    //Include URL in message if supplied
+		    if(!empty($authnet['url'])) $message .= " url=".$authnet['url'];
+		    CE_Lib::log(1, $message);
+		}
+		
+		//Check we got the correct http code
+		if($code !== 200) {
+		    $message = "Authorize.net curl error: code=$code, info=HTTP status code: $code";
+		    //Include URL in message if supplied
+		    if(!empty($authnet['url'])) $message .= " url=".$authnet['url'];
+		    CE_Lib::log(1, $message);
+		}
+		
 		//Get contents of output buffer into the authnet_array.
 		$authnet_array=ob_get_contents();
 		curl_close($ch);
