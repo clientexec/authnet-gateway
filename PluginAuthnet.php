@@ -86,11 +86,6 @@ class PluginAuthnet extends GatewayPlugin
                                         "value"         =>"1"
 
                                        ),
-                   lang("30 Day Billing") => array (
-                                        "type"          =>"hidden",
-                                        "description"   =>lang("Select YES if you want ClientExec to treat monthly billing by 30 day intervals.  If you select NO then the same day will be used to determine intervals."),
-                                        "value"         =>"0"
-                                       ),
                    lang("Check CVV2") => array (
                                         "type"          =>"hidden",
                                         "description"   =>lang("Select YES if you want to accept CVV2 for this plugin.  Please set your Authorize.net account to reject transactions with CVV2 mismatches."),
@@ -134,16 +129,6 @@ class PluginAuthnet extends GatewayPlugin
         //Environment Configuration
         $authnet['url']="https://secure.authorize.net/gateway/transact.dll"; //authorize.net url (post)
 
-        //check and see if pathCurl is installed on server
-        if ($params["pathCurl"]=="")
-        {
-              $authnet['useLibCurl']="True";
-        }else{
-              //absolute path to Curl on your system, not using libCurl
-              $authnet['curl_location']=$params["pathCurl"];
-              $authnet['useLibCurl']="False";
-        }
-
         //Transaction Information
         $authnet['cardnum']=$params["userCCNumber"];
         $authnet['amount']= $params["invoiceTotal"];
@@ -154,7 +139,7 @@ class PluginAuthnet extends GatewayPlugin
 
         // Authnet's library throws a lot of E_NOTICES...
         $errorReporting = error_reporting();
-        error_reporting(E_ALL & ~E_NOTICE);
+        error_reporting(0);
         include('plugins/gateways/authnet/functions.php');
         error_reporting($errorReporting);
 
@@ -164,7 +149,7 @@ class PluginAuthnet extends GatewayPlugin
             $authnet['type'] = 'VOID';
             // Authnet's library throws a lot of E_NOTICES...
             $errorReporting = error_reporting();
-            error_reporting(E_ALL & ~E_NOTICE);
+            error_reporting(0);
             include('plugins/gateways/authnet/functions.php');
             error_reporting($errorReporting);
             $transType = 'void';
@@ -213,16 +198,6 @@ class PluginAuthnet extends GatewayPlugin
         //Environment Configuration
         $authnet['url']="https://secure.authorize.net/gateway/transact.dll"; //authorize.net url (post)
 
-        //check and see if pathCurl is installed on server
-        if ($params["pathCurl"]=="")
-        {
-              $authnet['useLibCurl']="True";
-        }else{
-              //absolute path to Curl on your system, not using libCurl
-              $authnet['curl_location']=$params["pathCurl"];
-              $authnet['useLibCurl']="False";
-        }
-
         //Get information from current user
         //Contact Information
         $authnet['firstname']=$params["userFirstName"];
@@ -263,7 +238,7 @@ class PluginAuthnet extends GatewayPlugin
 
         // Authnet's library throws a lot of E_NOTICES...
         $errorReporting = error_reporting();
-        error_reporting(E_ALL & ~E_NOTICE);
+        error_reporting(0);
         include('plugins/gateways/authnet/functions.php');
         error_reporting($errorReporting);
 
