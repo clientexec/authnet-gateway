@@ -67,7 +67,7 @@ class PluginAuthnet extends GatewayPlugin
                                        ),
                    lang("Invoice After Signup") => array (
                                         "type"          =>"yesno",
-                                        "description"   =>lang("Select YES if you want an invoice sent to the customer after signup is complete."),
+                                        "description"   =>lang("Select YES if you want an invoice sent to the client after signup is complete."),
                                         "value"         =>"1"
                                        ),
                    lang("Signup Name") => array (
@@ -77,7 +77,7 @@ class PluginAuthnet extends GatewayPlugin
                                        ),
                    lang("Dummy Plugin") => array (
                                         "type"          =>"hidden",
-                                        "description"   =>lang("1 = Only used to specify a billing type for a customer. 0 = full fledged plugin requiring complete functions"),
+                                        "description"   =>lang("1 = Only used to specify a billing type for a client. 0 = full fledged plugin requiring complete functions"),
                                         "value"         =>"0"
                                        ),
                    lang("Auto Payment") => array (
@@ -97,7 +97,8 @@ class PluginAuthnet extends GatewayPlugin
     }
 
     function singlePayment($params)
-    { // when set to non recurring
+    {
+ // when set to non recurring
         //Function used to provide users with the ability
         //Plugin variables can be accesses via $params["plugin_[pluginname]_[variable]"] (ex. $params["plugin_paypal_UserID"])
         return $this->autopayment($params);
@@ -119,8 +120,11 @@ class PluginAuthnet extends GatewayPlugin
         $authnet['version']= "3.1";
         $authnet['method']="CC";
         $authnet['type']="CREDIT";
-        if ($params["plugin_authnet_Demo Mode"]==1){ $authnet['test']="True"; }
-        else { $authnet['test']="False"; }
+        if ($params["plugin_authnet_Demo Mode"]==1) {
+            $authnet['test']="True";
+        } else {
+            $authnet['test']="False";
+        }
 
         //Email Configuration
         $authnet['merchant_email']= $params["companyBillingEmail"];
@@ -131,7 +135,7 @@ class PluginAuthnet extends GatewayPlugin
 
         //Transaction Information
         $authnet['cardnum']=$params["userCCNumber"];
-        $authnet['amount']= $params["invoiceTotal"];
+        $authnet['amount']= sprintf("%01.2f", round($params["invoiceTotal"], 2));
         $authnet['cust_id']=$params["userID"];
         $authnet['invoice_num']=$params["invoiceNumber"];
         $authnet['description']=$params["invoiceDescription"];
@@ -156,7 +160,7 @@ class PluginAuthnet extends GatewayPlugin
         }
 
         //Hash Value From Authorize.Net
-        if ($params["plugin_authnet_MD5 Hash Value"] != ""){
+        if ($params["plugin_authnet_MD5 Hash Value"] != "") {
             //      $tHash =  $params["plugin_authnet_MD5 Hash Value"].$params["plugin_authnet_Authorize.Net API Login ID"].$authnet_results["x_trans_id"].sprintf("%01.2f", round($params["invoiceTotal"], 2));
             //      if (strtoupper(md5($tHash))!=strtoupper($authnet_results["x_md5_hash"])) return; //do not approve
         }
@@ -167,10 +171,10 @@ class PluginAuthnet extends GatewayPlugin
 
         //Return error code
 
-        if($authnet_results["x_response_code"] == 1
-          || $authnet_results["x_response_code"] == '*1*'){
+        if ($authnet_results["x_response_code"] == 1
+          || $authnet_results["x_response_code"] == '*1*') {
             return array('AMOUNT' => $authnet_results["x_amount"]);
-        }else{
+        } else {
             return $authnet_results["x_response_reason_text"]." Code:".$authnet_results["x_response_code"];
         }
     }
@@ -188,8 +192,11 @@ class PluginAuthnet extends GatewayPlugin
         $authnet['version']= "3.1";
         $authnet['method']="CC";
         $authnet['type']="AUTH_CAPTURE";
-        if ($params["plugin_authnet_Demo Mode"]==1){ $authnet['test']="True"; }
-        else { $authnet['test']="False"; }
+        if ($params["plugin_authnet_Demo Mode"]==1) {
+            $authnet['test']="True";
+        } else {
+            $authnet['test']="False";
+        }
 
         //Email Configuration
         $authnet['merchant_email']= $params["companyBillingEmail"];
@@ -217,10 +224,11 @@ class PluginAuthnet extends GatewayPlugin
         //used as the company name.  Wells Fargo
         //requires organization type. so we base it off
         //the organization name as well.
-        if ($params["userOrganization"]==""){;
+        if ($params["userOrganization"]=="") {
+            ;
             $authnet['company']="NA";
             $authnet['organization_type'] = "I";
-        }else{
+        } else {
             $authnet['company']=$params["userOrganization"];
             $authnet['organization_type'] = "B";
         }
@@ -230,7 +238,7 @@ class PluginAuthnet extends GatewayPlugin
         $authnet['expdate']=$params["userCCExp"];  //MM/YYYYY
         $authnet['card_code']=$params["userCCCVV2"];
 
-        $authnet['amount']= $params["invoiceTotal"];
+        $authnet['amount']= sprintf("%01.2f", round($params["invoiceTotal"], 2));
         $authnet['cust_id']=$params["userID"];
         $authnet['invoice_num']=$params["invoiceNumber"];
         $authnet['description']=$params["invoiceDescription"];
@@ -243,13 +251,13 @@ class PluginAuthnet extends GatewayPlugin
         error_reporting($errorReporting);
 
         //Hash Value From Authorize.Net
-        if ($params["plugin_authnet_MD5 Hash Value"] != ""){
+        if ($params["plugin_authnet_MD5 Hash Value"] != "") {
             //      $tHash =  $params["plugin_authnet_MD5 Hash Value"].$params["plugin_authnet_Authorize.Net API Login ID"].$authnet_results["x_trans_id"].sprintf("%01.2f", round($params["invoiceTotal"], 2));
             //      if (strtoupper(md5($tHash))!=strtoupper($authnet_results["x_md5_hash"])) return; //do not approve
         }
-        if ($params['isSignup']==1){
+        if ($params['isSignup']==1) {
             $bolInSignup = true;
-        }else{
+        } else {
             $bolInSignup = false;
         }
         include('plugins/gateways/authnet/callback.php');
@@ -263,4 +271,3 @@ class PluginAuthnet extends GatewayPlugin
         return $tReturnValue;
     }
 }
-?>
