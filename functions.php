@@ -112,7 +112,10 @@ if (function_exists('curl_init')) {
     CE_Lib::log(4, 'Calling authorize.net using cURL extension');
 
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+    $caPathOrFile = \Composer\CaBundle\CaBundle::getSystemCaRootBundlePath();
+    curl_setopt($ch, is_dir($caPathOrFile) ? CURLOPT_CAPATH : CURLOPT_CAINFO, $caPathOrFile);
     curl_setopt($ch,CURLOPT_URL,$authnet['url']);
     curl_setopt($ch,CURLOPT_POST,1);
     curl_setopt($ch,CURLOPT_POSTFIELDS,$data);
